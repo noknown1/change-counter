@@ -6,12 +6,21 @@ import PIL.ImageTk
 import numpy as np
 import cv2
 
+# DEFINITIONS #
+# GUI Colors and font
+WHITE = "#EEEFEA"
+BLACK = "#1c1c1c"
+PRIMARY = "#DCDCDC"
+FONT_PRIMARY = "Fixedsys"
+FONT_SECONDARY = "System"
+
 # INITIAL #
 # Define main window
 window_main = tk.Tk()
 window_main.title("Change Counter")
 window_main.geometry("+5+5")
 window_main.resizable(False, False)
+window_main.configure(bg=WHITE)
 
 # Variables
 window_main.source_image_path = ""      # Path for source image
@@ -206,7 +215,7 @@ def update_status(status_str):
 # GUI CREATION #
 # Create menu
 menu = Menu(window_main)
-file_items = Menu(menu, tearoff=0)
+file_items = Menu(menu, tearoff=0, bg=WHITE)
 file_items.add_command(label="Load Image", command=load_image)
 file_items.add_command(label="Save Output", command=save_image)
 menu.add_cascade(label="File", menu=file_items)
@@ -216,65 +225,65 @@ menu.add_cascade(label="Options", menu=options_items)
 window_main.config(menu=menu)
 
 # Create preview box for image
-window_main.image_canvas = tk.Canvas(window_main, width=600, height=570)
-window_main.image_canvas.create_rectangle(0, 0, 600, 600, fill="black")
+window_main.image_canvas = tk.Canvas(window_main, width=600, height=570, relief="flat")
+window_main.image_canvas.create_rectangle(0, 0, 600, 570, fill=BLACK)
 
 # Create buttons
-window_main.button_show_source = tk.Button(window_main, text="Show Source", command=show_source, padx="10")
-window_main.button_show_output = tk.Button(window_main, text="Show Output", command=show_output, padx="10")
-window_main.button_run = tk.Button(window_main, text="Run", command=run, padx="10")
+window_main.button_show_source = tk.Button(window_main, text="Show Source", font=(FONT_PRIMARY, 12), command=show_source, padx="10", bg=PRIMARY, fg=BLACK, relief="groove")
+window_main.button_show_output = tk.Button(window_main, text="Show Output", font=(FONT_PRIMARY, 12), command=show_output, padx="10", bg=PRIMARY, fg=BLACK, relief="groove")
+window_main.button_run = tk.Button(window_main, text="Run", font=(FONT_PRIMARY, 12), command=run, padx="10", bg=PRIMARY, fg=BLACK, relief="groove")
 
 # Create output labels
-window_main.lbl_title = tk.Label(window_main, text="Outputs", bg="grey", font=("Arial Bold", 12))
-window_main.lbl_pennies_count = tk.Label(window_main, text="Pennies", font=("Arial Bold", 10))
-window_main.lbl_nickles_count = tk.Label(window_main, text="Nickles", font=("Arial Bold", 10))
-window_main.lbl_dimes_count = tk.Label(window_main, text="Dimes", font=("Arial Bold", 10))
-window_main.lbl_quarters_count = tk.Label(window_main, text="Quarters", font=("Arial Bold", 10))
-window_main.lbl_total_count = tk.Label(window_main, text="Total", font=("Arial Bold", 10))
-window_main.lbl_pennies_count_num = tk.Label(window_main, text="0", font=("Arial", 8))
-window_main.lbl_pennies_count_cur = tk.Label(window_main, text="0", font=("Arial", 8))
-window_main.lbl_nickles_count_num = tk.Label(window_main, text="0", font=("Arial", 8))
-window_main.lbl_nickles_count_cur = tk.Label(window_main, text="0", font=("Arial", 8))
-window_main.lbl_dimes_count_num = tk.Label(window_main, text="0", font=("Arial", 8))
-window_main.lbl_dimes_count_cur = tk.Label(window_main, text="0", font=("Arial", 8))
-window_main.lbl_quarters_count_num = tk.Label(window_main, text="0", font=("Arial", 8))
-window_main.lbl_quarters_count_cur = tk.Label(window_main, text="0", font=("Arial", 8))
-window_main.lbl_total_count_num = tk.Label(window_main, text="0", font=("Arial", 8))
-window_main.lbl_total_count_cur = tk.Label(window_main, text="0", font=("Arial", 8))
+window_main.lbl_title = tk.Label(window_main, text="Outputs", font=(FONT_PRIMARY, 12), bg=PRIMARY, fg=BLACK)
+window_main.lbl_pennies_count = tk.Label(window_main, text="Pennies", font=(FONT_SECONDARY, 10), bg=PRIMARY, fg=BLACK)
+window_main.lbl_nickles_count = tk.Label(window_main, text="Nickles", font=(FONT_SECONDARY, 10), bg=PRIMARY, fg=BLACK)
+window_main.lbl_dimes_count = tk.Label(window_main, text="Dimes", font=(FONT_SECONDARY, 10), bg=PRIMARY, fg=BLACK)
+window_main.lbl_quarters_count = tk.Label(window_main, text="Quarters", font=(FONT_SECONDARY, 10), bg=PRIMARY, fg=BLACK)
+window_main.lbl_total_count = tk.Label(window_main, text="Total", font=(FONT_SECONDARY, 10), bg=PRIMARY, fg=BLACK)
+window_main.lbl_pennies_count_num = tk.Label(window_main, text="0", font=(FONT_SECONDARY, 8), bg=PRIMARY, fg=BLACK)
+window_main.lbl_pennies_count_cur = tk.Label(window_main, text="0", font=(FONT_SECONDARY, 8), bg=PRIMARY, fg=BLACK)
+window_main.lbl_nickles_count_num = tk.Label(window_main, text="0", font=(FONT_SECONDARY, 8), bg=PRIMARY, fg=BLACK)
+window_main.lbl_nickles_count_cur = tk.Label(window_main, text="0", font=(FONT_SECONDARY, 8), bg=PRIMARY, fg=BLACK)
+window_main.lbl_dimes_count_num = tk.Label(window_main, text="0", font=(FONT_SECONDARY, 8), bg=PRIMARY, fg=BLACK)
+window_main.lbl_dimes_count_cur = tk.Label(window_main, text="0", font=(FONT_SECONDARY, 8), bg=PRIMARY, fg=BLACK)
+window_main.lbl_quarters_count_num = tk.Label(window_main, text="0", font=(FONT_SECONDARY, 8), bg=PRIMARY, fg=BLACK)
+window_main.lbl_quarters_count_cur = tk.Label(window_main, text="0", font=(FONT_SECONDARY, 8), bg=PRIMARY, fg=BLACK)
+window_main.lbl_total_count_num = tk.Label(window_main, text="0", font=(FONT_SECONDARY, 8), bg=PRIMARY, fg=BLACK)
+window_main.lbl_total_count_cur = tk.Label(window_main, text="0", font=(FONT_SECONDARY, 8), bg=PRIMARY, fg=BLACK)
 
 # Create status label
 status_str = "Choose a source image (under 'File/Load Image'), and press run."
-window_main.status_label = tk.Label(window_main, text=status_str, font=("Arial", 8), fg="grey")
+window_main.status_label = tk.Label(window_main, text=status_str, font=("Arial", 8), bg=WHITE, fg=BLACK)
 
 # GUI LAYOUT #
 # Image preview
-window_main.image_canvas.grid(row=0, column=0, rowspan=2, columnspan=6, sticky="NESW", padx=2, pady=2)
+window_main.image_canvas.grid(row=0, column=0, rowspan=2, columnspan=6, sticky="NESW", padx=8, pady=8)
 
 # Buttons
 window_main.button_show_source.grid(row=3, column=0, sticky="NWE", padx=8, pady=2)
 window_main.button_show_output.grid(row=4, column=0, sticky="NWE", padx=8, pady=2)
-window_main.button_run.grid(row=5, column=0, sticky="NWE", padx=8, pady=2)
+window_main.button_run.grid(row=5, column=0, rowspan=2, sticky="NWES", padx=8, pady=2)
 
 # Output labels
-window_main.lbl_title.grid(row=3, column=1, columnspan=5, sticky="NWES", padx=8, pady=2)
+window_main.lbl_title.grid(row=3, column=1, columnspan=5, sticky="NWES", padx=(0,8))
 window_main.lbl_pennies_count.grid(row=4, column=1, sticky="NWES")
 window_main.lbl_nickles_count.grid(row=4, column=2, sticky="NWES")
 window_main.lbl_dimes_count.grid(row=4, column=3, sticky="NWES")
 window_main.lbl_quarters_count.grid(row=4, column=4, sticky="NWES")
-window_main.lbl_total_count.grid(row=4, column=5, sticky="NWES")
+window_main.lbl_total_count.grid(row=4, column=5, sticky="NWES", padx=(0,8))
 window_main.lbl_pennies_count_num.grid(row=5, column=1, sticky="NWES")
 window_main.lbl_nickles_count_num.grid(row=5, column=2, sticky="NWES")
 window_main.lbl_dimes_count_num.grid(row=5, column=3, sticky="NWES")
 window_main.lbl_quarters_count_num.grid(row=5, column=4, sticky="NWES")
-window_main.lbl_total_count_num.grid(row=5, column=5, sticky="NWES")
+window_main.lbl_total_count_num.grid(row=5, column=5, sticky="NWES", padx=(0,8))
 window_main.lbl_pennies_count_cur.grid(row=6, column=1, sticky="NWES")
 window_main.lbl_nickles_count_cur.grid(row=6, column=2, sticky="NWES")
 window_main.lbl_dimes_count_cur.grid(row=6, column=3, sticky="NWES")
 window_main.lbl_quarters_count_cur.grid(row=6, column=4, sticky="NWES")
-window_main.lbl_total_count_cur.grid(row=6, column=5, sticky="NWES")
+window_main.lbl_total_count_cur.grid(row=6, column=5, sticky="NWES", padx=(0,8))
 
 # Status label
-window_main.status_label.grid(row=7, column=0, columnspan=6, sticky="NWS", padx=8, pady=2)
+window_main.status_label.grid(row=7, column=0, columnspan=6, sticky="NWS", padx=8, pady=(12,0))
 
 # START #
 window_main.mainloop()
