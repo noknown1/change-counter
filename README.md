@@ -21,6 +21,8 @@ Once you have a picture uploaded to your computer, simply run the program and lo
 ### Accuracy
 
 There are many factors that will effect the accuracy of the program. 
+1) Lighting: Dark coins on a dark background will be hard to detect. The background should have a high contrast to all the coins.
+2) Photo Angle: Ideally, the shape of each coin in the image should be a perfect circle. If an image is taken of the coins at any sort of angle, it will cause the coin shapes to become ovals, which will cause trouble for the Hough-Circle's algorithm.
 
 ### Advanced Settings
 
