@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import Menu
+from tkinter import Menu, simpledialog
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 import PIL.Image
 import PIL.ImageTk
@@ -34,11 +34,19 @@ window_main.ran = False                 # Flag: True if an image has been proces
 resize_percentage = 0.30                # Percentage image will be scaled down to in order to increase performance
 error_small = 0.04                      # Acceptable size ratio error for smaller coins
 error_large = 0.10                      # Acceptable size ratio error for larger coins
+d_resize_percentage = 0.30              # Default value
+d_error_small = 0.04                    # Default value
+d_error_large = 0.10                    # Default value
+edge_threshold = 200                    # Specifies how sensitive the Hough transform's edge detector will be to edges
+circle_threshold = 35                   # Threshold controlling how sensitive the detection of circle centers will be
+d_edge_threshold = 200                  # Default value
+d_circle_threshold = 35                 # Default value
+
 
 # FUNCTION DEFINITIONS #
 # process_image: processes image, counts all coins and totals their values
 def process_image():
-    global resize_percentage, error_small, error_large
+    global resize_percentage, error_small, error_large, edge_threshold, circle_threshold
 
     # DEFINITIONS #
     # Defined coin ratios and ranges
@@ -71,8 +79,8 @@ def process_image():
         method=cv2.HOUGH_GRADIENT,
         dp=1,
         minDist=95,
-        param1=200,
-        param2=35,
+        param1=edge_threshold,
+        param2=circle_threshold,
         minRadius=0,
         maxRadius=0)
 
@@ -212,6 +220,65 @@ def update_status(status_str):
     window_main.status_label.configure(text=status_str)
     print(status_str)
 
+def adjustEdgeDectection():
+    global edge_threshold
+    edge_threshold = simpledialog.askinteger(
+        "Input",
+        "Current Value: " + str(edge_threshold) + "\nEnter edge threshold value (integer)",
+        parent=window_main,
+        minvalue=0,
+        maxvalue=1000)
+    update_status("Changed edge threshold to " + str(edge_threshold))
+
+def adjustCircleDectection():
+    global circle_threshold
+    circle_threshold = simpledialog.askinteger(
+        "Input",
+        "Current Value: " + str(circle_threshold) + "\nEnter circle threshold value (integer)",
+        parent=window_main,
+        minvalue=0,
+        maxvalue=1000)
+    update_status("Changed circle threshold to " + str(circle_threshold))
+
+def adjustSmallErrorAcceptance():
+    global error_small
+    error_small = simpledialog.askfloat(
+        "Input",
+        "Current Value: " + str(error_small) + "\nEnter circle threshold value (between 0 and 1)",
+        parent=window_main,
+        minvalue=0.01,
+        maxvalue=0.99)
+    update_status("Changed small error acceptance to " + str(error_small))
+
+def adjustLargeErrorAcceptance():
+    global error_large
+    error_large = simpledialog.askfloat(
+        "Input",
+        "Current Value: " + str(error_large) + "\nEnter circle threshold value (between 0 and 1)",
+        parent=window_main,
+        minvalue=0.01,
+        maxvalue=0.99)
+    update_status("Changed large error acceptance to " + str(error_large))
+
+def adjustResizePercentage():
+    global resize_percentage
+    resize_percentage = simpledialog.askfloat(
+        "Input",
+        "Current Value: " + str(resize_percentage) + "\nEnter resize percentage (between 0 and 1)",
+        parent=window_main,
+        minvalue=0.01,
+        maxvalue=0.99)
+    update_status("Changed resize percentage to " + str(resize_percentage))
+
+def resetValuesToDefualt():
+    global edge_threshold, circle_threshold, error_small, error_large, resize_percentage
+    edge_threshold = d_edge_threshold
+    circle_threshold = d_circle_threshold
+    error_small = d_error_small
+    error_large = d_error_large
+    resize_percentage = d_resize_percentage
+    update_status("All values reset to defaults.")
+
 # GUI CREATION #
 # Create menu
 menu = Menu(window_main)
@@ -219,9 +286,14 @@ file_items = Menu(menu, tearoff=0, bg=WHITE)
 file_items.add_command(label="Load Image", command=load_image)
 file_items.add_command(label="Save Output", command=save_image)
 menu.add_cascade(label="File", menu=file_items)
-options_items = Menu(menu, tearoff=0)
-options_items.add_command(label="Adjust Sensitivity")
-menu.add_cascade(label="Options", menu=options_items)
+adjust_items = Menu(menu, tearoff=0)
+adjust_items.add_command(label="Edge Detection Sensitivity...", command=adjustEdgeDectection)
+adjust_items.add_command(label="Circle Detection Sensitivity...", command=adjustCircleDectection)
+adjust_items.add_command(label="Small Error Acceptance...", command=adjustSmallErrorAcceptance)
+adjust_items.add_command(label="Large Error Acceptance...", command=adjustLargeErrorAcceptance)
+adjust_items.add_command(label="Resize Percentage...", command=adjustResizePercentage)
+adjust_items.add_command(label="Reset Values to Default", command=resetValuesToDefualt)
+menu.add_cascade(label="Adjust Values", menu=adjust_items)
 window_main.config(menu=menu)
 
 # Create preview box for image
