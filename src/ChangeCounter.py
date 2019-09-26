@@ -41,7 +41,8 @@ edge_threshold = 200                    # Specifies how sensitive the Hough tran
 circle_threshold = 35                   # Threshold controlling how sensitive the detection of circle centers will be
 d_edge_threshold = 200                  # Default value
 d_circle_threshold = 35                 # Default value
-
+blur_kernel = 9                         # Specifies kernel size for median blur ran on image during pre-proccessing
+d_blur_kernel = 9                       # Default value
 
 # FUNCTION DEFINITIONS #
 # process_image: processes image, counts all coins and totals their values
@@ -158,7 +159,7 @@ def process_image():
     window_main.lbl_nickles_count_cur.configure(text=str(nickles_change))
     window_main.lbl_dimes_count_cur.configure(text=str(dimes_change))
     window_main.lbl_quarters_count_cur.configure(text=str(quarters_change))
-    window_main.lbl_total_count_cur.configure(text=str(total_money))
+    window_main.lbl_total_count_cur.configure(text=str(np.round(total_money, 2)))
 
 # Menu commands (used for GUI menu bar)
 # load_image: Asks user to choose a source image to process
@@ -270,13 +271,24 @@ def adjustResizePercentage():
         maxvalue=0.99)
     update_status("Changed resize percentage to " + str(resize_percentage))
 
+def adjustBlur():
+    global blur_kernel
+    blur_kernel = simpledialog.askinteger(
+        "Input",
+        "Current Value: " + str(blur_kernel) + "\nEnter blur kernel size (odd integer)",
+        parent=window_main,
+        minvalue=3,
+        maxvalue=2025)
+    update_status("Changed blur kernel size to " + str(blur_kernel))
+
 def resetValuesToDefualt():
-    global edge_threshold, circle_threshold, error_small, error_large, resize_percentage
+    global edge_threshold, circle_threshold, error_small, error_large, resize_percentage, blur_kernel
     edge_threshold = d_edge_threshold
     circle_threshold = d_circle_threshold
     error_small = d_error_small
     error_large = d_error_large
     resize_percentage = d_resize_percentage
+    blur_kernel = d_blur_kernel
     update_status("All values reset to defaults.")
 
 # GUI CREATION #
@@ -292,6 +304,7 @@ adjust_items.add_command(label="Circle Detection Sensitivity...", command=adjust
 adjust_items.add_command(label="Small Error Acceptance...", command=adjustSmallErrorAcceptance)
 adjust_items.add_command(label="Large Error Acceptance...", command=adjustLargeErrorAcceptance)
 adjust_items.add_command(label="Resize Percentage...", command=adjustResizePercentage)
+adjust_items.add_command(label="Blur Kernel Size...", command=adjustBlur)
 adjust_items.add_command(label="Reset Values to Default", command=resetValuesToDefualt)
 menu.add_cascade(label="Adjust Values", menu=adjust_items)
 window_main.config(menu=menu)
