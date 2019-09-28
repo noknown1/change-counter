@@ -72,7 +72,7 @@ def process_image():
     resized_dim = (int(input_image.shape[1] * resize_percentage), int(input_image.shape[0] * resize_percentage))
     input_image = cv2.resize(input_image, resized_dim, interpolation=cv2.INTER_AREA)
     output_image = cv2.cvtColor(input_image, cv2.COLOR_GRAY2BGR)
-    input_image = cv2.medianBlur(input_image, 9)
+    input_image = cv2.medianBlur(input_image, blur_kernel)
 
     # Use HoughCircles from cv2 to collect all circles in the image
     circles = cv2.HoughCircles(
