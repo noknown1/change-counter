@@ -41,8 +41,8 @@ edge_threshold = 200                    # Specifies how sensitive the Hough tran
 circle_threshold = 35                   # Threshold controlling how sensitive the detection of circle centers will be
 d_edge_threshold = 200                  # Default value
 d_circle_threshold = 35                 # Default value
-blur_kernel = 9                         # Specifies kernel size for median blur ran on image during pre-proccessing
-d_blur_kernel = 9                       # Default value
+blur_kernel = 15                        # Specifies kernel size for gaussian blur ran on image during pre-proccessing
+d_blur_kernel = 15                      # Default value
 
 # FUNCTION DEFINITIONS #
 # process_image: processes image, counts all coins and totals their values
@@ -72,7 +72,8 @@ def process_image():
     resized_dim = (int(input_image.shape[1] * resize_percentage), int(input_image.shape[0] * resize_percentage))
     input_image = cv2.resize(input_image, resized_dim, interpolation=cv2.INTER_AREA)
     output_image = cv2.cvtColor(input_image, cv2.COLOR_GRAY2BGR)
-    input_image = cv2.medianBlur(input_image, blur_kernel)
+    input_image = cv2.GaussianBlur(input_image, (blur_kernel, blur_kernel), 0)
+
 
     # Use HoughCircles from cv2 to collect all circles in the image
     circles = cv2.HoughCircles(
