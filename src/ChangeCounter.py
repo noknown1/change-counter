@@ -30,6 +30,7 @@ window_main.source_image = []           # Source input image
 window_main.output_image = []           # Processed output image
 window_main.preview_image = []          # Preview image for GUI display
 window_main.ran = False                 # Flag: True if an image has been processed, otherwise false
+advanced_settings_shown = True         # Flag: True if the advanced settings panel is shown
 
 # Processing options
 resize_percentage = 0.30                # Percentage image will be scaled down to in order to increase performance
@@ -312,6 +313,16 @@ def resetValuesToDefualt():
 
     update_status("All values reset to defaults.")
 
+def toggleAdvancedSettings():
+    global advanced_settings_shown
+
+    if advanced_settings_shown:
+        window_main.adjustment_frame.grid_forget()
+        advanced_settings_shown = False
+    else:
+        window_main.adjustment_frame.grid(row=0, rowspan=6, column=6, sticky="NWES", pady=(12))
+        advanced_settings_shown = True
+
 # GUI CREATION #
 # Create menu
 menu = Menu(window_main)
@@ -328,6 +339,8 @@ adjust_items.add_command(label="Resize Percentage...", command=adjustResizePerce
 adjust_items.add_command(label="Blur Kernel Size...", command=adjustBlur)
 adjust_items.add_command(label="Reset Values to Default", command=resetValuesToDefualt)
 menu.add_cascade(label="Adjust Values", menu=adjust_items)
+menu.add_command(label="Show Advanced Settings", command=toggleAdvancedSettings)
+
 window_main.config(menu=menu)
 
 # Create preview box for image
@@ -433,4 +446,5 @@ window_main.slider_blur_kernel.grid(row=12, column=6, sticky="NWES", padx=0)
 window_main.button_set_to_default.grid(row=13, column=6, sticky="NWES", padx=6, pady=20)
 
 # START #
+toggleAdvancedSettings()
 window_main.mainloop()
