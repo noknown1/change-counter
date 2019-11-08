@@ -11,6 +11,7 @@ import cv2
 WHITE = "#EEEFEA"
 BLACK = "#1c1c1c"
 PRIMARY = "#DCDCDC"
+DEFAULT = "#F0F0F0"
 FONT_PRIMARY = "Fixedsys"
 FONT_SECONDARY = "System"
 
@@ -34,9 +35,9 @@ window_main.ran = False                 # Flag: True if an image has been proces
 resize_percentage = 0.30                # Percentage image will be scaled down to in order to increase performance
 error_small = 0.04                      # Acceptable size ratio error for smaller coins
 error_large = 0.10                      # Acceptable size ratio error for larger coins
-d_resize_percentage = 0.30              # Default value
-d_error_small = 0.04                    # Default value
-d_error_large = 0.10                    # Default value
+d_resize_percentage = 30                # Default value
+d_error_small = 4                       # Default value
+d_error_large = 10                      # Default value
 edge_threshold = 200                    # Specifies how sensitive the Hough transform's edge detector will be to edges
 circle_threshold = 35                   # Threshold controlling how sensitive the detection of circle centers will be
 d_edge_threshold = 200                  # Default value
@@ -183,10 +184,20 @@ def save_image():
 # Program functions (used to process the image)
 # run: will process image and display it in the preview box
 def run():
+    global resize_percentage, error_large, error_small, edge_threshold, circle_threshold, blur_kernel
     # Make sure there is a selected image to process
     if window_main.source_image_path == "":
         update_status("No image selected. Please load an image then press run.")
         return
+
+    # Get parameter data from sliders
+    resize_percentage = window_main.slider_resize_percentage.get() * 0.01
+    error_small = window_main.slider_small_error.get() * 0.01
+    error_large = window_main.slider_large_error.get() * 0.01
+    edge_threshold = window_main.slider_edge_threshold.get()
+    circle_threshold = window_main.slider_circle_threshold.get()
+    blur_kernel = window_main.slider_blur_kernel.get()
+
     update_status("Processing image...")
     process_image()
     update_status("Image processed, output shown.")
@@ -286,10 +297,19 @@ def resetValuesToDefualt():
     global edge_threshold, circle_threshold, error_small, error_large, resize_percentage, blur_kernel
     edge_threshold = d_edge_threshold
     circle_threshold = d_circle_threshold
-    error_small = d_error_small
-    error_large = d_error_large
-    resize_percentage = d_resize_percentage
+    error_small = d_error_small * 0.01
+    error_large = d_error_large * 0.01
+    resize_percentage = d_resize_percentage * 0.01
     blur_kernel = d_blur_kernel
+
+    # Set sliders to default
+    window_main.slider_edge_threshold.set(d_edge_threshold)
+    window_main.slider_circle_threshold.set(d_circle_threshold)
+    window_main.slider_small_error.set(d_error_small)
+    window_main.slider_large_error.set(d_error_large)
+    window_main.slider_resize_percentage.set(d_resize_percentage)
+    window_main.slider_blur_kernel.set(d_blur_kernel)
+
     update_status("All values reset to defaults.")
 
 # GUI CREATION #
@@ -341,35 +361,76 @@ window_main.lbl_total_count_cur = tk.Label(window_main, text="0", font=(FONT_SEC
 status_str = "Choose a source image (under 'File/Load Image'), and press run."
 window_main.status_label = tk.Label(window_main, text=status_str, font=("Arial", 8), bg=WHITE, fg=BLACK)
 
+# Create adjustment panel
+window_main.adjustment_frame = tk.Frame(window_main, bg=WHITE)
+window_main.lbl_adjustment_panel_title = tk.Label(window_main.adjustment_frame, text="Adjustments", font=(FONT_PRIMARY, 12), bg=WHITE, fg=BLACK)
+window_main.lbl_edge_threshold = tk.Label(window_main.adjustment_frame, text="Edge Threshold", font=(FONT_SECONDARY, 8), bg=WHITE, fg=BLACK)
+window_main.slider_edge_threshold = tk.Scale(window_main.adjustment_frame, from_=1, to=500, bg=WHITE, orient=tk.HORIZONTAL)
+window_main.slider_edge_threshold.set(d_edge_threshold)
+window_main.lbl_circle_threshold = tk.Label(window_main.adjustment_frame, text="Circle Threshold", font=(FONT_SECONDARY, 8), bg=WHITE, fg=BLACK)
+window_main.slider_circle_threshold = tk.Scale(window_main.adjustment_frame, from_=1, to=100, bg=WHITE, orient=tk.HORIZONTAL)
+window_main.slider_circle_threshold.set(d_circle_threshold)
+window_main.lbl_small_error = tk.Label(window_main.adjustment_frame, text="Small Error Percentage", font=(FONT_SECONDARY, 8), bg=WHITE, fg=BLACK)
+window_main.slider_small_error = tk.Scale(window_main.adjustment_frame, from_=1, to=99, bg=WHITE, orient=tk.HORIZONTAL)
+window_main.slider_small_error.set(d_error_small)
+window_main.lbl_large_error = tk.Label(window_main.adjustment_frame, text="Large Error Percentage", font=(FONT_SECONDARY, 8), bg=WHITE, fg=BLACK)
+window_main.slider_large_error = tk.Scale(window_main.adjustment_frame, from_=1, to=99, bg=WHITE, orient=tk.HORIZONTAL)
+window_main.slider_large_error.set(d_error_large)
+window_main.lbl_resize_percentage = tk.Label(window_main.adjustment_frame, text="Resize Percentage", font=(FONT_SECONDARY, 8), bg=WHITE, fg=BLACK)
+window_main.slider_resize_percentage = tk.Scale(window_main.adjustment_frame, from_=1, to=99, bg=WHITE, orient=tk.HORIZONTAL)
+window_main.slider_resize_percentage.set(d_resize_percentage)
+window_main.lbl_blur_kernel = tk.Label(window_main.adjustment_frame, text="Blur Kernel", font=(FONT_SECONDARY, 8), bg=WHITE, fg=BLACK)
+window_main.slider_blur_kernel = tk.Scale(window_main.adjustment_frame, from_=3, to=49, resolution=3, bg=WHITE, orient=tk.HORIZONTAL)
+window_main.slider_blur_kernel.set(d_blur_kernel)
+window_main.button_set_to_default = tk.Button(window_main.adjustment_frame, text="Set to Default", font=(FONT_PRIMARY, 12), command=resetValuesToDefualt, padx="10", bg=PRIMARY, fg=BLACK, relief="groove")
+
+
 # GUI LAYOUT #
 # Image preview
-window_main.image_canvas.grid(row=0, column=0, rowspan=2, columnspan=6, sticky="NESW", padx=8, pady=8)
+window_main.image_canvas.grid(row=0, column=0, rowspan=7, columnspan=6, sticky="NESW", padx=8, pady=8)
 
 # Buttons
-window_main.button_show_source.grid(row=3, column=0, sticky="NWE", padx=8, pady=2)
-window_main.button_show_output.grid(row=4, column=0, sticky="NWE", padx=8, pady=2)
-window_main.button_run.grid(row=5, column=0, rowspan=2, sticky="NWES", padx=8, pady=2)
+window_main.button_show_source.grid(row=8, column=0, sticky="NWE", padx=8, pady=2)
+window_main.button_show_output.grid(row=9, column=0, sticky="NWE", padx=8, pady=2)
+window_main.button_run.grid(row=10, column=0, rowspan=2, sticky="NWES", padx=8, pady=2)
 
 # Output labels
-window_main.lbl_title.grid(row=3, column=1, columnspan=5, sticky="NWES", padx=(0,8))
-window_main.lbl_pennies_count.grid(row=4, column=1, sticky="NWES")
-window_main.lbl_nickles_count.grid(row=4, column=2, sticky="NWES")
-window_main.lbl_dimes_count.grid(row=4, column=3, sticky="NWES")
-window_main.lbl_quarters_count.grid(row=4, column=4, sticky="NWES")
-window_main.lbl_total_count.grid(row=4, column=5, sticky="NWES", padx=(0,8))
-window_main.lbl_pennies_count_num.grid(row=5, column=1, sticky="NWES")
-window_main.lbl_nickles_count_num.grid(row=5, column=2, sticky="NWES")
-window_main.lbl_dimes_count_num.grid(row=5, column=3, sticky="NWES")
-window_main.lbl_quarters_count_num.grid(row=5, column=4, sticky="NWES")
-window_main.lbl_total_count_num.grid(row=5, column=5, sticky="NWES", padx=(0,8))
-window_main.lbl_pennies_count_cur.grid(row=6, column=1, sticky="NWES")
-window_main.lbl_nickles_count_cur.grid(row=6, column=2, sticky="NWES")
-window_main.lbl_dimes_count_cur.grid(row=6, column=3, sticky="NWES")
-window_main.lbl_quarters_count_cur.grid(row=6, column=4, sticky="NWES")
-window_main.lbl_total_count_cur.grid(row=6, column=5, sticky="NWES", padx=(0,8))
+window_main.lbl_title.grid(row=8, column=1, columnspan=5, sticky="NWES", padx=(0,8))
+window_main.lbl_pennies_count.grid(row=9, column=1, sticky="NWES")
+window_main.lbl_nickles_count.grid(row=9, column=2, sticky="NWES")
+window_main.lbl_dimes_count.grid(row=9, column=3, sticky="NWES")
+window_main.lbl_quarters_count.grid(row=9, column=4, sticky="NWES")
+window_main.lbl_total_count.grid(row=9, column=5, sticky="NWES", padx=(0,8))
+window_main.lbl_pennies_count_num.grid(row=10, column=1, sticky="NWES")
+window_main.lbl_nickles_count_num.grid(row=10, column=2, sticky="NWES")
+window_main.lbl_dimes_count_num.grid(row=10, column=3, sticky="NWES")
+window_main.lbl_quarters_count_num.grid(row=10, column=4, sticky="NWES")
+window_main.lbl_total_count_num.grid(row=10, column=5, sticky="NWES", padx=(0,8))
+window_main.lbl_pennies_count_cur.grid(row=11, column=1, sticky="NWES")
+window_main.lbl_nickles_count_cur.grid(row=11, column=2, sticky="NWES")
+window_main.lbl_dimes_count_cur.grid(row=11, column=3, sticky="NWES")
+window_main.lbl_quarters_count_cur.grid(row=11, column=4, sticky="NWES")
+window_main.lbl_total_count_cur.grid(row=11, column=5, sticky="NWES", padx=(0,8))
 
 # Status label
-window_main.status_label.grid(row=7, column=0, columnspan=6, sticky="NWS", padx=8, pady=(12,0))
+window_main.status_label.grid(row=12, column=0, columnspan=6, sticky="NWS", padx=8, pady=(12,0))
+
+# Adjustment panel
+window_main.adjustment_frame.grid(row=0, rowspan=6, column=6, sticky="NWES", pady=(12))
+window_main.lbl_adjustment_panel_title.grid(row=0, column=6, sticky="NWES", pady=(0,20), padx=65)
+window_main.lbl_edge_threshold.grid(row=1, column=6, sticky="NWS", padx=0)
+window_main.slider_edge_threshold.grid(row=2, column=6, sticky="NWES", padx=0)
+window_main.lbl_circle_threshold.grid(row=3, column=6, sticky="NWS", padx=0)
+window_main.slider_circle_threshold.grid(row=4, column=6, sticky="NWES", padx=0)
+window_main.lbl_small_error.grid(row=5, column=6, sticky="NWS", padx=0)
+window_main.slider_small_error.grid(row=6, column=6, sticky="NWES", padx=0)
+window_main.lbl_large_error.grid(row=7, column=6, sticky="NWS", padx=0)
+window_main.slider_large_error.grid(row=8, column=6, sticky="NWES", padx=0)
+window_main.lbl_resize_percentage.grid(row=9, column=6, sticky="NWS", padx=0)
+window_main.slider_resize_percentage.grid(row=10, column=6, sticky="NWES", padx=0)
+window_main.lbl_blur_kernel.grid(row=11, column=6, sticky="NWS", padx=0)
+window_main.slider_blur_kernel.grid(row=12, column=6, sticky="NWES", padx=0)
+window_main.button_set_to_default.grid(row=13, column=6, sticky="NWES", padx=6, pady=20)
 
 # START #
 window_main.mainloop()
